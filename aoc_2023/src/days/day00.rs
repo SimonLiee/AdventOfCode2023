@@ -1,13 +1,19 @@
 use std::fs::read_to_string;
 
-const EX_INPUT : &str = "./input/day00ex";
+const EX_INPUT1 : &str = "./input/day00ex1";
+const EX_INPUT2 : &str = "./input/day00ex2";
 const INPUT : &str = "./input/day00";
 
-fn get_input(example: bool) -> Vec<String>{
+fn get_input(example: bool, part: u32) -> Vec<String>{
     let input : &str;
     if example {
         println!("Running with example input.");
-        input = EX_INPUT;
+
+        if part == 2{
+            input = EX_INPUT2;
+        } else {
+            input = EX_INPUT1;
+        }
     } else {
         println!("Running with full input.");
         input = INPUT;
@@ -20,7 +26,7 @@ fn get_input(example: bool) -> Vec<String>{
 }
 
 pub fn part1(example : bool) {
-    let input : Vec<String> = get_input(example);
+    let input : Vec<String> = get_input(example, 1);
         
     println!("Input: {:?}", input);
 
@@ -28,7 +34,7 @@ pub fn part1(example : bool) {
 }
 
 pub fn part2(example : bool) {
-    let input : Vec<String> = get_input(example);
+    let input : Vec<String> = get_input(example, 2);
 
     println!("Input: {:?}", input);
 
