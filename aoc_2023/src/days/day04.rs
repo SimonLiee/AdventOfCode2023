@@ -82,15 +82,15 @@ pub fn part2(example : bool) {
 
 
     for (i, card) in cards.iter().enumerate() {        
-        for _j in 0..card_count[i] {
-            let mut score = 0;
-            for winning_num in card.0.iter() {
-                for your_num in card.1.iter() {
-                    if *winning_num == *your_num {
-                        score += 1;
-                    }
+        let mut score = 0;
+        for winning_num in card.0.iter() {
+            for your_num in card.1.iter() {
+                if *winning_num == *your_num {
+                    score += 1;
                 }
             }
+        }
+        for _j in 0..card_count[i] {
             for j in 0..score {
                 if i + 1 + j < card_count.len(){
                     card_count[i + 1 + j] += 1;
