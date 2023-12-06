@@ -123,7 +123,7 @@ pub fn part2(example : bool) {
         }
         num.push(first_num);
         num.push(last_num);
-        dbg!(&num);
+
         total += num.parse::<i32>().unwrap();
     }
 

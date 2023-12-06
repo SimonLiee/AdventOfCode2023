@@ -79,7 +79,6 @@ pub fn part1(example : bool) {
             }
         }
         if !invalid {
-            dbg!(i+1);
             total += i+1;
         }
     }

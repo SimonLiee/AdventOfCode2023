@@ -100,7 +100,6 @@ pub fn part2(example : bool) {
             }
         }
     }
-    dbg!(&gears);
     for (_gear, nums) in gears {
         if nums.len() == 2 {
             total += nums[0] * nums[1];
