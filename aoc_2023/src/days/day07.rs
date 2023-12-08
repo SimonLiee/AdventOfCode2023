@@ -58,7 +58,7 @@ fn score_hand(hand : &Vec<u32>) -> usize {
     let mut scores = vec![0;cards.len()];
 
     for (i, elem1) in cards.iter().enumerate() {
-        for (j, elem2) in hand.iter().enumerate() {
+        for (_j, elem2) in hand.iter().enumerate() {
             if elem1 == elem2 {
                 scores[i] += 1;
             }

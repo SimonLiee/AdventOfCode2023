@@ -6,8 +6,9 @@ pub mod day04;
 pub mod day05;
 pub mod day06;
 pub mod day07;
+pub mod day08;
 
-pub const DAYS : [[fn(bool);2];8] = [
+pub const DAYS : [[fn(bool);2];9] = [
     [
         day00::part1,
         day00::part2,
@@ -39,5 +40,9 @@ pub const DAYS : [[fn(bool);2];8] = [
     [
         day07::part1,
         day07::part2,
+    ],
+    [
+        day08::part1,
+        day08::part2,
     ],
 ];
