@@ -71,7 +71,6 @@ pub fn part2(example : bool) {
     let (dir, nodes) = parse_input(input);
 
     let mut current = Vec::new();
-    let mut count = 0;
 
     for i in nodes.keys() {
         if i.ends_with('A') {
