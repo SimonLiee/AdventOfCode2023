@@ -53,11 +53,7 @@ pub fn part1(example : bool) {
     ]);
 
     let mut pos1 = start_pos;
-    let mut pos2 = start_pos;
-    let mut last_pos1: (usize, usize) = start_pos;
-    let mut last_pos2 = start_pos;
     let mut dir1 = (1, 0, 0, 0);
-    let mut dir2 = (1, 0, 0, 0);
     let dirs = [(1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)];
 
     for dir in dirs {
@@ -67,12 +63,10 @@ pub fn part1(example : bool) {
             if check_connects(pipe_type, dir){
                 if pos1 == start_pos {
                     pos1 = pos;
+                    dbg!(dir);
                     dir1 = new_dir(pipe_type, dir);
-                } else {
-                    pos2 = pos;
-                    dir2 = new_dir(pipe_type, dir);
-                }
-                
+                    dbg!(dir1);
+                } 
             }
         }
     }
@@ -80,55 +74,23 @@ pub fn part1(example : bool) {
     let mut count = 1;
     loop{
         let pos = get_pos(pos1, dir1);
-        if pos == last_pos1 || pos == pos1 {
-            continue;
+        dbg!(pos1);
+        if pipes[pos.0][pos.1] == 'S' {
+            break;
         }
-        if pos.0 >= pipes.len() || pos.1 >= pipes[0].len() {
-            continue;
-        }
-        
+
         if pipe_types.contains_key(&pipes[pos.0][pos.1]) {
             let pipe_type = *pipe_types.get(&pipes[pos.0][pos.1]).unwrap();
             if check_connects( pipe_type, dir1){
-                last_pos1 = pos1;
                 pos1 = pos;
                 count += 1;
 
                 dir1 = new_dir(pipe_type, dir1);
             }
         }
-        if pos1 == pos2 {
-            count -= 1;
-            break;
-        }
-
-
-        let pos = get_pos(pos2, dir2);
-        if pos == last_pos2 || pos == pos2 {
-            continue;
-        }
-        if pos.0 >= pipes.len() || pos.1 >= pipes[0].len() {
-            continue;
-        }
-
-        if pipe_types.contains_key(&pipes[pos.0][pos.1]) {
-            let pipe_type = *pipe_types.get(&pipes[pos.0][pos.1]).unwrap();
-            if check_connects( pipe_type, dir2){
-                last_pos2 = pos2;
-                pos2 = pos;
-                dir2 = new_dir(pipe_type, dir2);
-            }
-        }
-        
-        if pos1 == pos2 {
-            break;
-        }
     }
-
-    dbg!(pos1);
-    dbg!(pos2);
-
-    println!("Result: {:?}", count);
+ 
+    println!("Result: {:?}", count / 2 + 1);
 }
 
 fn get_pos(pos: (usize, usize), dir : (usize, usize, usize, usize)) -> (usize, usize) { 
@@ -190,8 +152,151 @@ fn check_connects(pipe1 : (usize, usize, usize, usize), pipe2 : (usize, usize, u
 
 pub fn part2(example : bool) {
     let input : Vec<String> = get_input(example, 2);
+        
+    let pipes : Vec<Vec<char>> = input.iter()
+        .map(|x| x.chars().collect())
+        .collect();
 
-    println!("Input: {:?}", input);
+    let mut start_pos = (0, 0);
+    for i in 0..pipes.len() {
+        let tmp = pipes[i].iter().position(|&x| x == 'S');
+        if tmp.is_some() {
+            start_pos = (i, tmp.unwrap());
+        }
+    }
 
-    println!("Result: {}", 1);
+
+    let pipe_types : HashMap<char, (usize, usize, usize, usize)> = HashMap::from([
+        ('L', (1, 1, 0, 0)), // North East South West
+        ('F', (0, 1, 1, 0)),
+        ('|', (1, 0, 1, 0)),
+        ('-', (0, 1, 0, 1)),
+        ('J', (1, 0, 0, 1)),
+        ('7', (0, 0, 1, 1)),
+    ]);
+
+    let mut pos1 = start_pos;
+    let mut dir1 = (1, 0, 0, 0);
+    let dirs = [(1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)];
+    
+    let mut loopmap = vec![vec!['O'; pipes[0].len()] ;pipes.len()];
+
+    for dir in dirs {
+        let pos = get_pos(start_pos, dir);
+        if pipe_types.contains_key(&pipes[pos.0][pos.1]) {
+            let pipe_type = *pipe_types.get(&pipes[pos.0][pos.1]).unwrap();
+            if check_connects(pipe_type, dir){
+                if pos1 == start_pos {
+                    pos1 = pos;
+                    dir1 = new_dir(pipe_type, dir);
+                    break;
+                } 
+            }
+        }
+    }
+
+    loopmap[pos1.0][pos1.1] = pipes[pos1.0][pos1.1];
+
+    loop{
+        let pos = get_pos(pos1, dir1);
+        
+        loopmap[pos1.0][pos1.1] = pipes[pos1.0][pos1.1];
+
+        if pipes[pos.0][pos.1] == 'S' {
+            loopmap[pos.0][pos.1] = 'L';
+            break;
+        }
+
+        if pipe_types.contains_key(&pipes[pos.0][pos.1]) {
+            let pipe_type = *pipe_types.get(&pipes[pos.0][pos.1]).unwrap();
+            if check_connects( pipe_type, dir1){
+                pos1 = pos;
+                dir1 = new_dir(pipe_type, dir1);
+            }
+        }
+    }
+
+    let start_list = ['F', 'L'];
+    let stop_list = ['7', 'J'];
+
+    let mut new: Vec<Vec<char>> = vec![Vec::new() ;pipes.len()];
+    for i in 0..loopmap.len() {
+        for j in 0..loopmap[i].len() {
+            new[i].push(loopmap[i][j]);
+            if start_list.contains(&loopmap[i][j]) {
+                new[i].push('-');
+            } else if stop_list.contains(&loopmap[i][j]) {
+                new[i].push('o');
+            } else if loopmap[i][j] == '-' {
+                new[i].push('-');
+            } else {
+                new[i].push('o');
+            }
+        }    
+    }
+
+    loopmap = new;
+    for i in 0..loopmap.len() {
+        loopmap.insert(i*2, Vec::new());
+    }
+    loopmap.remove(0);
+    loopmap.push(Vec::new());
+
+    let start_list = ['F', '7'];
+    let stop_list = ['L', 'J'];
+    for j in 0..loopmap[0].len(){
+        for i in 0..loopmap.len()/2 {
+            if start_list.contains(&loopmap[i * 2][j]) {
+                loopmap[i*2+1].push('|');
+            } else if stop_list.contains(&loopmap[i * 2][j]) {
+                loopmap[i*2+1].push('o');
+            } else if loopmap[i * 2][j] == '|' {
+                loopmap[i*2+1].push('|');
+            } else {
+                loopmap[i*2+1].push('o');
+            }
+        }
+    }
+
+    let mut run = true;
+    while run {
+        run = false;
+        for i in 0..loopmap.len() {
+            for j in 0..loopmap[i].len() {
+                if loopmap[i][j] != 'o' && loopmap[i][j] != 'O' {
+                    continue;
+                }
+                if i == 0 || j == 0 || i == loopmap.len() - 1 || j == loopmap[0].len() - 1 {
+                    loopmap[i][j] = 'X';
+                    run = true;
+                    continue;
+                }
+
+                if loopmap[i+1][j] == 'X' {
+                    loopmap[i][j] = 'X';
+                    run = true;
+                } else if loopmap[i][j-1] == 'X' {
+                    loopmap[i][j] = 'X';
+                    run = true;
+                } else if loopmap[i-1][j] == 'X' {
+                    loopmap[i][j] = 'X';
+                    run = true;
+                } else if loopmap[i][j+1] == 'X' {
+                    loopmap[i][j] = 'X';
+                    run = true;
+                }
+            }
+        }
+    }
+
+    let mut count = 0;
+    for i in &loopmap {
+        for j in i {
+            if *j == 'O'{
+                count += 1;
+            }
+        }
+    }
+
+    println!("Result: {:?}", count);
 }
